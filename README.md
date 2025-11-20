@@ -1,5 +1,9 @@
 # Naruto-Style Fine-Tuning on SDXL
+Training weights and logs are publicly available on HuggingFace:
+1. [SDXL LORA training](https://huggingface.co/sprodem/sdxl-naruto-lora)
+2. [SDXL DreamBooth training](https://huggingface.co/sprodem/Naruto_Drambooth_LoRA/tree/main)
 
+For inference, use the notebook [SDXL_Inference.ipynb](./SDXL_Inference.ipynb) to load the fine-tuned weights (or the original SDXL pipeline) and generate Naruto-style images using custom prompts.
 ## 1. Task Overview
 The aim is to adapt a large text-to-image diffusion model (SDXL) to a new style domain under heavy GPU constraints.
 
@@ -17,7 +21,7 @@ Fine-tune [Stable Diffusion XL Base 1.0](https://huggingface.co/stabilityai/stab
 This repo provides two solutions, each offering a different strategy for teaching SDXL the Naruto style.
 
 ### Solution 1 — SDXL LoRA
-File: SDXL_LORA_RES_1024_RUNNING.ipynb
+File: [SDXL_LORA_RES_1024_RUNNING.ipynb](./SDXL_LORA_RES_1024_RUNNING.ipynb)
 [LoRA (Low-Rank Adaptation)](https://arxiv.org/abs/2106.09685) is a parameter efficient fine-tuning method for large diffusion models. Instead of updating all model weights which is slow and memory heavy, LoRA injects small trainable rank decomposition matrices into the attention layers. During training, only these lightweight adapters are updated, making fine-tuning faster, cheaper, and GPU-friendly while preserving the base model’s quality.
 
 #### Why LoRA works for style training?
@@ -36,6 +40,7 @@ This allows SDXL to adopt the Naruto style without retraining billions of parame
    - Checkpointing after every step: If training crashes due to OOM, we can resume instantly without losing progress.
 
 ### Solution 2 — SDXL DreamBooth
+File: [SDXL_DreamBooth_LoRA.ipynb](SDXL_DreamBooth_LoRA.ipynb)
 [DreamBooth](https://arxiv.org/abs/2208.12242) is a fine-tuning technique that teaches a diffusion model to deeply understand and reproduce a specific subject or style using a small set of reference images (typically 3–10). It learns unique identity features like a person, character, object, or art style—and integrates them into the model so we can generate new images of that subject in any pose, environment, or context using a special trigger word.
 #### SDXL DreamBooth Implementation Explanation
 1. DreamBooth does not require a very large dataset. We sampled 50 random images from the Naruto dataset for fine-tuning.
