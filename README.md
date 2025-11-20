@@ -35,7 +35,7 @@ This allows SDXL to adopt the Naruto style without retraining billions of parame
    - Mixed Precision (FP16) — FP16 uses 16-bit floating point numbers instead of 32-bit. This reduces VRAM by nearly 50% in activations, gradients, and model parameters.
    - Checkpointing after every step: If training crashes due to OOM, we can resume instantly without losing progress.
 
-### Solution 1 — SDXL DreamBooth
+### Solution 2 — SDXL DreamBooth
 [DreamBooth](https://arxiv.org/abs/2208.12242) is a fine-tuning technique that teaches a diffusion model to deeply understand and reproduce a specific subject or style using a small set of reference images (typically 3–10). It learns unique identity features like a person, character, object, or art style—and integrates them into the model so we can generate new images of that subject in any pose, environment, or context using a special trigger word.
 #### SDXL DreamBooth Implementation Explanation
 1. DreamBooth does not require a very large dataset. We sampled 50 random images from the Naruto dataset for fine-tuning.
@@ -43,7 +43,27 @@ This allows SDXL to adopt the Naruto style without retraining billions of parame
 3. Applied LoRA on top of DreamBooth: A full DreamBooth fine-tune for SDXL is not possible on 16GB VRAM. We combine DreamBooth (token-based concept learning) and LoRA (lightweight parameter updates)
 4. Other Optimizations Used: We reuse optimizations use in solution 1 (Gradient checkpointing, Mixed precision (fp16), 8-bit AdamW, Step-wise checkpoint saving)
 
-## 3. Future Work
+## 3. Visual Results
+Comparing the results from the original SDXL pipeline, Solution-1(LoRA), and Solution-2(DreamBooth).
+Prompt: Bill Gates in Naruto style
+<table>
+  <tr>
+    <td align="center">
+      <img src="sample_results/og_bill_gates.png" width="250"/><br/>
+      <sub><b>Original Pipeline</b></sub>
+    </td>
+    <td align="center">
+      <img src="sample_results/lora_bill_gates.png" width="250"/><br/>
+      <sub><b>Fine-tuned using LoRA</b></sub>
+    </td>
+    <td align="center">
+      <img src="sample_results/dreambooth_bill_gates.png" width="250"/><br/>
+      <sub><b>Fine-tuned using DreamBooth</b></sub>
+    </td>
+  </tr>
+</table>
+
+## 4. Future Work
 1. Use [DoRA (Weight-Decomposed LoRA)](https://arxiv.org/abs/2402.09353) : DoRA improves upon LoRA by decomposing weight magnitude & direction separately. Provides better fine-tuning and more stable style retention.
 2. Use xFormers attention : xFormers includes highly efficient attention kernels that can reduce VRAM usage, improve speed and allow bigger batches.
 
